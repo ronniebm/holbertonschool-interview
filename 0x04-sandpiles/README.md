@@ -30,8 +30,6 @@
   width="150px"
 />
 
-## **Forms** 👔
-
 <br>
 
 <!-- Learning objectives section -->
