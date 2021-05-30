@@ -26,7 +26,7 @@
 <!-- image and subtitle section -->
 
 <img
-  src="https://pics.freeicons.io/uploads/icons/png/6941370591582885795-512.png"
+  src="https://image.flaticon.com/icons/png/512/90/90603.png"
   width="150px"
 />
 
