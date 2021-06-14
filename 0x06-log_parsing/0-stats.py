@@ -1,47 +1,45 @@
 #!/usr/bin/python3
 """
-Module that parses a log and prints stats to stdout
+    Reads stdin line by line and computes metrics:
+    For every 10 lines:
+        - print the status number with the number of times it
+        appears
+        - print the sum of the file sizes
 """
-from sys import stdin
-
-status_codes = {
-    "200": 0,
-    "301": 0,
-    "400": 0,
-    "401": 0,
-    "403": 0,
-    "404": 0,
-    "405": 0,
-    "500": 0
-}
-
-size = 0
-
-
-def print_stats():
-    """Prints the accumulated logs"""
-    print("File size: {}".format(size))
-    for status in sorted(status_codes.keys()):
-        if status_codes[status]:
-            print("{}: {}".format(status, status_codes[status]))
-
-
 if __name__ == "__main__":
-    count = 0
+    import sys
+    import signal
+
+    c = fileSize = 0
+    statCount = {"200": 0, "301": 0, "400": 0, "401": 0, "403": 0,
+                 "404": 0, "405": 0, "500": 0}
+
+    def handleTen(statCount, fileSize):
+        print("File size: {}".format(fileSize))
+        for key in sorted(statCount.keys()):
+            if statCount[key] == 0:
+                continue
+            print("{}: {}".format(key, statCount[key]))
+
     try:
-        for line in stdin:
+        for line in sys.stdin:
+            c += 1
+            split = line.split(" ")
             try:
-                items = line.split()
-                size += int(items[-1])
-                if items[-2] in status_codes:
-                    status_codes[items[-2]] += 1
-            except:
+                status = split[-2]
+                fileSize += int(split[-1])
+
+                if status in statCount:
+                    statCount[status] += 1
+            except Exception:
                 pass
-            if count == 9:
-                print_stats()
-                count = -1
-            count += 1
-    except KeyboardInterrupt:
-        print_stats()
+
+            if c % 10 == 0:
+                handleTen(statCount, fileSize)
+
+        else:
+            handleTen(statCount, fileSize)
+
+    except (KeyboardInterrupt, SystemExit):
+        handleTen(statCount, fileSize)
         raise
-    print_stats()
