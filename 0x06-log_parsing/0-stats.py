@@ -1,39 +1,50 @@
 #!/usr/bin/python3
 """
-Script that reads stdin line by line and computes metrics
+Module that parses a log and prints stats to stdout
 """
+from sys import stdin
 
+status_codes = {
+    "200": 0,
+    "301": 0,
+    "400": 0,
+    "401": 0,
+    "403": 0,
+    "404": 0,
+    "405": 0,
+    "500": 0
+}
 
-import sys
-
-
-status_codes = {'200': 0, '301': 0, '400': 0, '401': 0, '403': 0, '404': 0,
-                '405': 0, '500': 0}
-counter = 0
 size = 0
 
-try:
-    for l in sys.stdin:
-        data = l.split()
-        data = data[::-1]
 
-        if len(data) > 2:
-            counter += 1
-            if counter <= 10:
-                size += int(data[0])
-                code = data[1]
+def print_stats():
+    """Prints the accumulated logs"""
+    print("File size: {}".format(size))
+    for status in sorted(status_codes.keys()):
+        if status_codes[status]:
+            print("{}: {}".format(status, status_codes[status]))
 
-            if code in status_codes.keys():
-                status_codes[code] += 1
 
-            if counter == 10:
-                print('File size: {}'.format(size))
-                for sc, v in sorted(status_codes.items()):
-                    if v != 0:
-                        print('{}: {}'.format(sc, v))
-                counter = 0
-finally:
-    print('File size: {}'.format(size))
-    for sc, v in sorted(status_codes.items()):
-        if v != 0:
-            print('{}: {}'.format(sc, v))
+if __name__ == "__main__":
+    count = 0
+    try:
+        for line in stdin:
+            try:
+                items = line.split()
+                size += int(items[-1])
+                if items[-2] in status_codes:
+                    status_codes[items[-2]] += 1
+            except:
+                pass
+
+            if count == 9:
+                print_stats()
+                count = -1
+            count += 1
+
+    except KeyboardInterrupt:
+        print_stats()
+        raise
+
+    print_stats()
