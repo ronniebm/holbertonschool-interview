@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Module that parses a log and prints stats to stdout.
+Module that parses a log and prints stats to stdout
 """
 from sys import stdin
 
@@ -37,14 +37,11 @@ if __name__ == "__main__":
                     status_codes[items[-2]] += 1
             except:
                 pass
-
             if count == 9:
                 print_stats()
                 count = -1
             count += 1
-
     except KeyboardInterrupt:
         print_stats()
         raise
-
     print_stats()
