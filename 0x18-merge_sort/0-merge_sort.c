@@ -1,67 +1,92 @@
 #include "sort.h"
+
 /**
- * merge - merges l and r arrays into original array
- * @array: pointer to array
- * @size: size of the array
- * @l: pointer to left array
- * @r: pointer to right array
- **/
-void merge(int *array, int *l, int *r, size_t size)
-{
-	int i = 0, j = 0, k = 0;
-	int size_l, size_r;
+ * merge_sort - sorts an array of ints using top-down merge sort algorithm
+ * @array: array of integers to sort
+ * @size: size of the array of integers to sort
+ *
+ */
 
-	size_l = size / 2;
-	size_r = size - size_l;
-	printf("Merging...\n");
-	printf("[left]: ");
-	print_array(l, size_l);
-	printf("[right]: ");
-	print_array(r, size_r);
-
-	while (i < size_l && j < size_r)
-	{
-		if (l[i] < r[j])
-			array[k++] = l[i++];
-		else
-			array[k++] = r[j++];
-	}
-
-	while (i < size_l)
-		array[k++] = l[i++];
-
-	while (j < size_r)
-		array[k++] = r[j++];
-	printf("[Done]: ");
-	print_array(array, size);
-}
-/**
- * merge_sort - sorts an array of integers in ascending order using
- * the Merge sort algorithm
- * @array: pointer to array
- * @size: size of the array
- **/
 void merge_sort(int *array, size_t size)
 {
-	size_t mid = 0, i;
-	int left[1000];
-	int right[1000];
+	int *holder = malloc(sizeof(int) * size);
 
-	if (!array)
+	if (holder == NULL)
+		return;
+	if (size <= 1 || array == NULL)
+	{
+		free(holder);
+		return;
+	}
+	merge_holder(array, size, holder);
+	free(holder);
+}
+
+/**
+ * merge_holder - sorts array of ints with top-down merge sort algorithm
+ * and includes malloced holder array
+ * @array: array of integers to sort
+ * @size: size of the array of integers to sort
+ * @holder: temp array to hold information during merge
+ */
+
+void merge_holder(int *array, size_t size, int *holder)
+{
+	int mid = size / 2;
+
+	if (size <= 1)
 		return;
 
-	if (size < 2)
-		return;
+	merge_holder(array, mid, holder);
+	merge_holder(&array[mid], size - mid, holder);
+	merge(holder, array, mid, size);
+}
 
-	mid = size / 2;
+/**
+ * merge - merges two subarrays together
+ * @holder: temp array to hold information during merge
+ * @array: array to merge
+ * @mid: index of mid-point
+ * @size: size of array to merge
+ *
+ */
 
-	for (i = 0; i < mid; i++)
-		left[i] = array[i];
+void merge(int *holder, int *array, int mid, size_t size)
+{
+	int left = 0, right = mid, index = 0;
 
-	for (i = mid; i < size; i++)
-		right[i - mid] = array[i];
-
-	merge_sort(left, mid);
-	merge_sort(right, size - mid);
-	merge(array, left, right, size);
+	printf("Merging...\n[left]: ");
+	print_array(array, mid);
+	printf("[right]: ");
+	print_array(&array[mid], size - mid);
+	while (left < mid && right < (int)size)
+	{
+		if (array[left] <= array[right])
+		{
+			holder[index] = array[left];
+			left++;
+		}
+		else
+		{
+			holder[index] = array[right];
+			right++;
+		}
+		index++;
+	}
+	while (left < mid)
+	{
+		holder[index] = array[left];
+		left++;
+		index++;
+	}
+	while (right < (int)size)
+	{
+		holder[index] = array[right];
+		right++;
+		index++;
+	}
+	for (index = 0; index < (int)size; index++)
+		array[index] = holder[index];
+	printf("[Done]: ");
+	print_array(array, size);
 }
